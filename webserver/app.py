@@ -3,7 +3,7 @@ import logging
 
 from aiohttp import web
 
-from webserver import register_routes
+from webserver.articles import route as article_route
 
 
 logger = logging.getLogger("Web")
@@ -78,23 +78,17 @@ async def error_middleware(request, handler):
         return await handle_error(ex, request)
 
 
-def setup_web():
+def setup_web(set_propagate_error, hacker_scrape):
     global propagate_error
-    
+    propagate_error = set_propagate_error
+
     app = web.Application()
-
-    PORT = int(environ.get("PORT", 80))
-    logger.info("Port set to %s", PORT)
-
-    ADDRESS = environ.get("ADDRESS", "0.0.0.0")
-    logger.info("Address set to %s", ADDRESS)
-
-    propagate_error = bool(int(environ.get("API_PROPAGATE_500_ERRORS", 0)))
-    logger.info("Will popagate 500 errors: %s", propagate_error)
+    app['hacker_scrape'] = hacker_scrape
 
     app.middlewares.append(error_middleware)
 
     app.add_routes(main_route)
-    register_routes(app, "webserver")
 
-    return app, ADDRESS, PORT
+    app.add_routes(article_route)
+
+    return app
