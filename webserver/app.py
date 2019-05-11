@@ -89,7 +89,7 @@ def setup_web():
     ADDRESS = environ.get("ADDRESS", "0.0.0.0")
     logger.info("Address set to %s", ADDRESS)
 
-    propagate_error = bool(int(environ.get("SHOW_500", 0)))
+    propagate_error = bool(int(environ.get("API_PROPAGATE_500_ERRORS", 0)))
     logger.info("Will popagate 500 errors: %s", propagate_error)
 
     app.middlewares.append(error_middleware)
