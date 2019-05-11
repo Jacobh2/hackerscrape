@@ -6,28 +6,29 @@ import sqlite3
 
 class Repository(object):
 
-    QUERY__ARTICLE_PUT = "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?);"
-    QUERY_ARTICLE_GET = "SELECT * FROM article"
+    QUERY__ARTICLE_PUT = "INSERT INTO article VALUES (:header, :author, :created, :points, :link, :num_comments);"
+    QUERY_ARTICLE_GET = "SELECT header, author, created, points, link, num_comments FROM article"
 
     def __init__(self, db_name):
         self.conn = sqlite3.connect(db_name)
 
     def put_article(self, articles: List[Article]) -> bool:
-        ret = False
         try:
             with self.conn as cur:
-                cur.executemany(self.QUERY__ARTICLE_PUT, list(map(tuple, articles)))
-            ret = True
+                cur.executemany(self.QUERY__ARTICLE_PUT, list(map(Article._asdict, articles)))
+            return True
         except Exception:
+            # TODO: Log and raise
             pass
-        return ret
+        return False
 
     def get_article(self) -> List[Article]:
-        articles = None
         try:
             with self.conn as cur:
                 cur.execute(self.QUERY_ARTICLE_GET)
-                articles = cur.fetchall()
+                raw_articles = cur.fetchall()
+                return list(map(lambda a: Article(*a), raw_articles))
         except Exception:
+            # TODO: Log and raise
             pass
-        return articles
+        return None
