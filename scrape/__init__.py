@@ -6,13 +6,13 @@ from bs4 import BeautifulSoup
 
 from objects.article import Article
 
-URL = "https://news.ycombinator.com/newest"
-
 
 class ScrapeManager(object):
+    URL = "https://news.ycombinator.com/newest"
+
     def scrape(self) -> List[Article]:
         """Scrapes the first page of Hacker News."""
-        content = self._get(URL)
+        content = self._get(self.URL)
         return self._parse(content)
 
     def _parse(self, content: str) -> List[Article]:
