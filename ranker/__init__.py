@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from objects.article import Article
-from typing import List, Protocol
+from typing import List
+from typing_extensions import Protocol
 
 
 class Ranker(Protocol):
@@ -21,4 +22,4 @@ class PointRanker(object):
 
 class HeaderRanker(object):
     def rank(self, articles: List[Article]) -> List[Article]:
-        return sorted(articles, key=lambda article: article.header, reverse=True)
+        return sorted(articles, key=lambda article: article.header)
