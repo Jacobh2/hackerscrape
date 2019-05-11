@@ -1,27 +1,16 @@
+from os import environ
+import logging
+
 from aiohttp import web
 
-from os import environ
+from webserver import register_routes
 
-import logging
 
 logger = logging.getLogger("Web")
 
-
-app = web.Application()
-
 main_route = web.RouteTableDef()
 
-PORT = int(environ.get("PORT", 80))
-logger.info("Port set to %s", PORT)
-
-ADDRESS = environ.get("ADDRESS", "0.0.0.0")
-logger.info("Address set to %s", ADDRESS)
-
-BASE_ROUTE_PATH = environ.get("BASE_ROUTE_PATH", "api")
-logger.info("Base route set to %s", BASE_ROUTE_PATH)
-
-propagate_error = bool(int(environ.get("SHOW_500", 0)))
-logger.info("Will popagate 500 errors: %s", propagate_error)
+propagate_error = False
 
 
 @main_route.get("/")
@@ -89,6 +78,23 @@ async def error_middleware(request, handler):
         return await handle_error(ex, request)
 
 
-app.middlewares.append(error_middleware)
+def setup_web():
+    global propagate_error
+    
+    app = web.Application()
 
-app.add_routes(main_route)
+    PORT = int(environ.get("PORT", 80))
+    logger.info("Port set to %s", PORT)
+
+    ADDRESS = environ.get("ADDRESS", "0.0.0.0")
+    logger.info("Address set to %s", ADDRESS)
+
+    propagate_error = bool(int(environ.get("API_PROPAGATE_500_ERRORS", 0)))
+    logger.info("Will popagate 500 errors: %s", propagate_error)
+
+    app.middlewares.append(error_middleware)
+
+    app.add_routes(main_route)
+    register_routes(app, "webserver")
+
+    return app, ADDRESS, PORT

@@ -3,9 +3,10 @@ from os import environ
 from aiohttp import web
 
 import logger_config
-from webserver import app
-
 logger = logger_config.setup(log_output=environ.get("LOG_OUTPUT"))
+
+# We want to config the logging before loading anything else
+from webserver import app
 
 
 def exception_handler(loop, context):
@@ -14,9 +15,10 @@ def exception_handler(loop, context):
 
 async def create_webserver(loop):
     logger.info("Starting HTTP")
-    runner = web.AppRunner(app.app)
+    webapp, address, port = app.setup_web()
+    runner = web.AppRunner(webapp)
     await runner.setup()
-    site = web.TCPSite(runner, app.ADDRESS, app.PORT)
+    site = web.TCPSite(runner, address, port)
     await site.start()
 
 
