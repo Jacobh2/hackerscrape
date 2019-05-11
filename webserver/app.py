@@ -3,7 +3,7 @@ import logging
 
 from aiohttp import web
 
-from webserver.articles import ArticleRoute
+from webserver.articles import route as article_route
 
 
 logger = logging.getLogger("Web")
@@ -83,12 +83,12 @@ def setup_web(set_propagate_error, hacker_scrape):
     propagate_error = set_propagate_error
 
     app = web.Application()
+    app['hacker_scrape'] = hacker_scrape
 
     app.middlewares.append(error_middleware)
 
     app.add_routes(main_route)
 
-    article_routes = ArticleRoute(hacker_scrape)
-    app.add_routes(article_routes)
+    app.add_routes(article_route)
 
     return app

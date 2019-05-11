@@ -31,6 +31,8 @@ async def create_webserver(loop, address, port, propagate_error, hacker_scrape):
 def setup_hacker_scrape(db_name):
     content_provider = lambda url: requests.get(url).text
     repository = Repository(db_name)
+    repository.create_table()
+    
     scrape_manager = ScrapeManager(content_provider)
     ranker = HeaderRanker()
     return HackerScrape(repository, scrape_manager, ranker)
