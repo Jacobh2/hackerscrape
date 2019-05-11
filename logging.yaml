@@ -1,0 +1,23 @@
+---
+version: 1
+disable_existing_loggers: False
+formatters:
+  full:
+    format: "%(asctime)s#%(levelname)-7s:%(threadName)-10s:%(name)-17s:%(funcName) -25s:%(lineno) -4d:%(message)s"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: full
+    stream: ext://sys.stdout
+  mtlog:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: full
+    name: "/tmp/default.log"
+    mode: a
+    maxsize: 41943040
+    rotate: 10
+root:
+  level: DEBUG
+  handlers: [console, mtlog]
