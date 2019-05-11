@@ -1,0 +1,14 @@
+version: '3'
+services:
+  hackerscrape:
+    build: .
+    command: ["python", "main.py"]
+    environment:
+      - PORT=80
+      - ADDRESS=0.0.0.0
+      - LOG_LEVEL=DEBUG
+      - LOG_OUTPUT=/tmp/receiver.log
+      - DB_NAME=hacks.db
+      - SHOW_500=1
+    ports:
+     - 8080:80
