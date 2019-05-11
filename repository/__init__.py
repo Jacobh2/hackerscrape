@@ -27,16 +27,16 @@ class Repository(object):
 
     def create_table(self):
         try:
-            with self.conn as cur:
-                cur.execute(self.QUERY_ARTICLE_CREATE_TABLE)
+            with self.conn:
+                self.conn.execute(self.QUERY_ARTICLE_CREATE_TABLE)
         except Exception:
             logger.exception("Failed to create table")
             raise
 
     def put_article(self, articles: List[Article]) -> bool:
         try:
-            with self.conn as cur:
-                cur.executemany(self.QUERY_ARTICLE_PUT, list(map(Article._asdict, articles)))
+            with self.conn:
+                self.conn.executemany(self.QUERY_ARTICLE_PUT, list(map(Article._asdict, articles)))
             return True
         except Exception:
             logger.exception("Failed to save articles")
@@ -44,7 +44,8 @@ class Repository(object):
 
     def get_article(self) -> List[Article]:
         try:
-            with self.conn as cur:
+            with self.conn:
+                cur = self.conn.cursor()
                 cur.execute(self.QUERY_ARTICLE_GET)
                 raw_articles = cur.fetchall()
                 return list(map(lambda a: Article(*a), raw_articles))
