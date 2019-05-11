@@ -2,3 +2,4 @@ aiohttp
 beautifulsoup4==4.7.1
 PyYAML
 requests==2.21.0
+typing-extensions==3.7.2
