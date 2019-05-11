@@ -1,0 +1,15 @@
+---
+version: 1
+disable_existing_loggers: False
+formatters:
+  full:
+    format: "%(asctime)s#%(levelname)-7s:%(threadName)-10s:%(name)-17s:%(funcName) -25s:%(lineno) -4d:%(message)s"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: full
+    stream: ext://sys.stdout
+root:
+  level: DEBUG
+  handlers: [console]
