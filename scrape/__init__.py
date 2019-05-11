@@ -10,9 +10,12 @@ from objects.article import Article
 class ScrapeManager(object):
     URL = "https://news.ycombinator.com/newest"
 
+    def __init__(self, content_provider):
+        self.content_provider = content_provider
+
     def scrape(self) -> List[Article]:
         """Scrapes the first page of Hacker News."""
-        content = self._get(self.URL)
+        content = self.content_provider(self.URL)
         return self._parse(content)
 
     def _parse(self, content: str) -> List[Article]:
@@ -22,13 +25,10 @@ class ScrapeManager(object):
             Article(
                 header=x.text,
                 author="Anonymous",
-                created=datetime.now(),
+                created="1970-01-01",
                 points=1,
                 link=x["href"],
                 num_comments=0,
             )
             for x in titles
         ]
-
-    def _get(self, url: str) -> str:
-        return requests.get(url).text

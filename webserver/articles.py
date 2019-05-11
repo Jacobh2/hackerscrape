@@ -1,66 +1,36 @@
 import logging
 import http
-from os import environ
 
 from aiohttp import web
 from aiohttp.http_exceptions import HttpProcessingError
 
-from repository import Repository
-from scrape import ScrapeManager
-from ranker import HeaderRanker
-
-
-repository = Repository(environ["DB_NAME"])
-repository.create_table()
-
-scrape_manager = ScrapeManager()
-
-header_ranker = HeaderRanker()
-
-
 route = web.RouteTableDef()
 
-logger = logging.getLogger("HTTP-Articles")
 
+class ArticleRoute(object):
+    def __init__(self, hacker_scrape):
+        self.logger = logging.getLogger("ArticleRoute")
+        self.hacker_scrape = hacker_scrape
 
-@route.get("/articles")
-async def get_ranked_articles(request):
-    global repository
-    logger.info("Client requests ranked articles")
+    @route.get("/articles")
+    async def get_ranked_articles(self, request):
+        self.logger.info("Client requests ranked articles")
+        articles = self.hacker_scrape.get_ranked_articles()
 
-    # Ask repository for articles
-    articles = repository.get_article()
-    logger.info("Found %s articles", len(articles))
+        if not articles:
+            raise HttpProcessingError(message="", code=http.HTTPStatus.NO_CONTENT)
 
-    if not articles:
-        raise HttpProcessingError(message="", code=http.HTTPStatus.NO_CONTENT)
+        return web.json_response({"ok": True, "data": articles})
 
-    # Run ranker given the articles
-    ranked_articles = header_ranker.rank(articles)
+    @route.put("/articles")
+    async def save_new_articles(self, request):
+        logger.info("Client requests to save new articles")
+        save_ok = self.hacker_scrape.save_new_articles()
 
-    # Format them for a json response
-    ranked_articles = list(map(lambda a: a._asdict(), ranked_articles))
+        if not save_ok:
+            raise HttpProcessingError(
+                message="Failed to save articles",
+                code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+            )
 
-    # Return!
-    return web.json_response({"ok": True, "data": ranked_articles})
-
-
-@route.put("/articles")
-async def save_new_articles(request):
-    global repository
-    logger.info("Client requests to save new articles")
-
-    # Scrape the site
-    articles = scrape_manager.scrape()
-
-    # Save the articles
-    save_ok = repository.put_article(articles)
-
-    if not save_ok:
-        raise HttpProcessingError(
-            message="Failed to save articles",
-            code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
-        )
-
-    # Return!
-    return web.json_response({"ok": True})
+        return web.json_response({"ok": True})
