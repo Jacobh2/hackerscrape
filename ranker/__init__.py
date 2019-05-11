@@ -1,17 +1,19 @@
-from objects import Article
+from abc import abstractmethod
+from objects.article import Article
 from typing import List, Protocol
 
 
-class Ranker(object):
+class Ranker(Protocol):
+    @abstractmethod
     def rank(self, articles: List[Article]) -> List[Article]:
-        raise NotImplementedError
+        pass
 
 
-class DateRanker(Ranker):
+class DateRanker(object):
     def rank(self, articles: List[Article]) -> List[Article]:
-        return sorted(articles, key=lambda article: article.date, reverse=True)
+        return sorted(articles, key=lambda article: article.created, reverse=True)
 
 
-class ScoreRanker(Ranker):
+class ScoreRanker(object):
     def rank(self, articles: List[Article]) -> List[Article]:
-        return sorted(articles, key=lambda article: article.score, reverse=True)
+        return sorted(articles, key=lambda article: article.points, reverse=True)
