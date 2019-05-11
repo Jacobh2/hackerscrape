@@ -10,14 +10,6 @@ handlers:
     level: DEBUG
     formatter: full
     stream: ext://sys.stdout
-  mtlog:
-    class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: full
-    name: "/tmp/default.log"
-    mode: a
-    maxsize: 41943040
-    rotate: 10
 root:
   level: DEBUG
-  handlers: [console, mtlog]
+  handlers: [console]
