@@ -9,11 +9,16 @@ class Ranker(Protocol):
         pass
 
 
-class DateRanker(object):
+class CreatedRanker(object):
     def rank(self, articles: List[Article]) -> List[Article]:
         return sorted(articles, key=lambda article: article.created, reverse=True)
 
 
-class ScoreRanker(object):
+class PointRanker(object):
     def rank(self, articles: List[Article]) -> List[Article]:
         return sorted(articles, key=lambda article: article.points, reverse=True)
+
+
+class HeaderRanker(object):
+    def rank(self, articles: List[Article]) -> List[Article]:
+        return sorted(articles, key=lambda article: article.header, reverse=True)
